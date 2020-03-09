@@ -10,7 +10,14 @@ geometry_kube_namespace() {
 
 geometry_kube_context() {
   local kube_context="$(kubectl config current-context 2> /dev/null)"
-  ansi ${GEOMETRY_KUBE_CONTEXT_COLOR:=default} ${kube_context}
+  local cluster_name=$kube_context
+
+  if [[ $kube_context =~ 'gke.*' ]]; then
+    local context_parts=("${(@s/_/)kube_context}")
+    cluster_name=$context_parts[4]
+  fi
+
+  ansi ${GEOMETRY_KUBE_CONTEXT_COLOR:=default} ${cluster_name}
 }
 
 geometry_kube_version() {
